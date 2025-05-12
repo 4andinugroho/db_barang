@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id" class=""> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Database Barang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/heroicons@2.1.3/24/outline/index.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/heroicons@2.1.3/24/outline/index.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-content-wrapper {
+            flex-grow: 1;
+        }
+        .data-table { display: none; }
+        .data-table.active { display: table; }
+
+        /* Styling Tab Aktif */
+        .tab-button.active {
+            background-color: #3B82F6; /* Light: Biru */
+            color: white;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 5px 0 rgba(0, 0, 0, 0.06); /* Shadow lebih halus */
+        }
+        .dark .tab-button.active {
+            background-color: #2563EB; /* Dark: Biru lebih gelap */
+            box-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.05); /* Shadow terang di dark mode */
+        }
+
+        /* Transisi untuk semua elemen yang mungkin berubah */
+        * {
+           transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Styling Header Tabel */
+        thead th {
+            background-color: #F9FAFB;
+            font-weight: 600; /* Sedikit lebih tebal */
+        }
+        .dark thead th {
+             background-color: #1F2937; /* Dark: Sedikit lebih gelap dari body dark */
+             color: #9CA3AF;
+             font-weight: 500;
+        }
+
+        /* Zebra striping & Hover Tabel */
+        tbody tr:nth-child(even) { background-color: #F9FAFB; }
+        .dark tbody tr:nth-child(even) { background-color: #1F2937; }
+        tbody tr:hover { background-color: #EFF6FF; }
+        .dark tbody tr:hover { background-color: #374151; }
+
+        /* Styling Teks Dark Mode */
+        .dark tbody td { color: #D1D5DB; }
+        .dark .text-gray-500 { color: #9CA3AF; }
+        .dark .text-gray-600 { color: #D1D5DB; }
+        .dark .text-gray-700 { color: #E5E7EB; }
+        .dark .text-gray-900 { color: #F9FAFB; }
+        .dark .border-gray-200 { border-color: #374151; } /* Border lebih gelap */
+        .dark .bg-white { background-color: #111827; } /* Background utama dark */
+        .dark .bg-gray-100 { background-color: #1F2937; }
+        .dark .hover\:bg-gray-100:hover { background-color: #374151; }
+        .dark .hover\:text-gray-800:hover { color: #F9FAFB; }
+        .dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3); } /* Shadow lebih gelap */
+        .dark .focus\:ring-gray-700:focus { --tw-ring-color: #4B5563; }
+        .dark .placeholder-gray-400::placeholder { color: #9CA3AF; }
+
+    </style>
+    <script>
+        // Apply theme on initial load
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-br dark:from-gray-900 dark:via-black dark:to-gray-800">
+
+    <div class="main-content-wrapper container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 flex justify-between items-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 text-center flex-grow flex items-center justify-center sm:justify-start">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mr-3 text-blue-600 dark:text-blue-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5-3.75a8.25 8.25 0 0 0-16.5 0" />
+                </svg>
+                <span class="hidden sm:inline">Dashboard Database Barang</span>
+                <span class="sm:hidden">DB Barang</span> </h1>
+             <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 ml-4 flex-shrink-0">
+                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+            </button>
+        </header>
+
+        <main class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 sm:p-8 border dark:border-gray-700">
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <nav class="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-0 sm:border-b-0">
+                    <ul class="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3">
+                         <li><button class="tab-button flex items-center gap-2 text-sm sm:text-base font-medium text-gray-600 py-2 px-3 sm:py-2.5 sm:px-5 rounded-lg active" onclick="showTable('barang')">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h13.5m-13.5 7.5h13.5m-1.5-15.75l-1.5-1.5-1.5 1.5m1.5 1.5v4.5m-7.5-4.5l-1.5-1.5-1.5 1.5m1.5 1.5v4.5m7.5 0l-1.5-1.5-1.5 1.5m1.5 1.5v4.5m-7.5-4.5l-1.5-1.5-1.5 1.5m1.5 1.5v4.5m10.5 0l-1.5-1.5-1.5 1.5m1.5 1.5V18m-1.5-12.75l-1.5-1.5-1.5 1.5m1.5 1.5V18" /></svg>
+                            Barang
+                        </button></li>
+                         <li><button class="tab-button flex items-center gap-2 text-sm sm:text-base font-medium text-gray-600 py-2 px-3 sm:py-2.5 sm:px-5 rounded-lg" onclick="showTable('suplier')">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 0 1 3.375-3.375h1.5a1.125 1.125 0 0 1 1.125 1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375m15 1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-1.5a3.375 3.375 0 0 1-3.375-3.375V9.75" /></svg>
+                            Supplier
+                        </button></li>
+                         <li><button class="tab-button flex items-center gap-2 text-sm sm:text-base font-medium text-gray-600 py-2 px-3 sm:py-2.5 sm:px-5 rounded-lg" onclick="showTable('transaksi')">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                            Transaksi
+                        </button></li>
+                         <li><button class="tab-button flex items-center gap-2 text-sm sm:text-base font-medium text-gray-600 py-2 px-3 sm:py-2.5 sm:px-5 rounded-lg" onclick="showTable('det_transaksi')">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.125 1.125 0 0 1 0 2.25H5.625a1.125 1.125 0 0 1 0-2.25Z" /></svg>
+                            Detail
+                        </button></li>
+                         <li><button class="tab-button flex items-center gap-2 text-sm sm:text-base font-medium text-gray-600 py-2 px-3 sm:py-2.5 sm:px-5 rounded-lg" onclick="showTable('joined')">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
+                            Gabungan
+                        </button></li>
+                    </ul>
+                </nav>
+                <div class="relative mt-4 sm:mt-0 w-full sm:w-auto">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                         </svg>
+                    </div>
+                    <input type="text" id="table-search" class="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 sm:text-sm text-gray-900 dark:text-gray-100" placeholder="Cari data...">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto relative shadow-md sm:rounded-lg border border-gray-200 dark:border-gray-600">
+                <table id="table-barang" class="data-table active w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">Kode Barang</th>
+                            <th scope="col" class="px-6 py-4">Nama Barang</th>
+                            <th scope="col" class="px-6 py-4">Merek</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-barang"></tbody>
+                </table>
+                <table id="table-suplier" class="data-table w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                     <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">Kode Supplier</th>
+                            <th scope="col" class="px-6 py-4">Nama Supplier</th>
+                            <th scope="col" class="px-6 py-4">Alamat</th>
+                            <th scope="col" class="px-6 py-4">Telepon</th>
+                            <th scope="col" class="px-6 py-4">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-suplier"></tbody>
+                </table>
+                <table id="table-transaksi" class="data-table w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">No Transaksi</th>
+                            <th scope="col" class="px-6 py-4">Tanggal</th>
+                            <th scope="col" class="px-6 py-4">Kode Supplier</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-transaksi"></tbody>
+                </table>
+                <table id="table-det_transaksi" class="data-table w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">ID Detail</th>
+                            <th scope="col" class="px-6 py-4">No Transaksi</th>
+                            <th scope="col" class="px-6 py-4">Kode Barang</th>
+                            <th scope="col" class="px-6 py-4 text-center">Jumlah</th>
+                            <th scope="col" class="px-6 py-4 text-right">Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-det_transaksi"></tbody>
+                </table>
+                <table id="table-joined" class="data-table w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">No Transaksi</th>
+                            <th scope="col" class="px-6 py-4">Tanggal</th>
+                            <th scope="col" class="px-6 py-4">Nama Supplier</th>
+                            <th scope="col" class="px-6 py-4">Nama Barang</th>
+                            <th scope="col" class="px-6 py-4 text-center">Jumlah</th>
+                            <th scope="col" class="px-6 py-4 text-right">Harga Satuan</th>
+                            <th scope="col" class="px-6 py-4 text-right">Total Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-joined"></tbody>
+                </table>
+            </div>
+        </main>
+    </div> <footer class="mt-auto text-center text-sm text-gray-500 dark:text-gray-400 py-5 px-4 sm:px-6 lg:px-8 border-t dark:border-gray-700">
+         &copy; <span id="copyright-year"></span> Andi Nugroho. All Rights Reserved.
+    </footer>
+
+    <script>
+        // --- Simulasi Data Database (Sama seperti sebelumnya) ---
+        const dataBarang = [
+            { kd_barang: 'B01', nama_barang: 'Flashdisk', merek: 'San Disk' },
+            { kd_barang: 'C01', nama_barang: 'Mouse', merek: 'Logitech' },
+            { kd_barang: 'D02', nama_barang: 'Speaker', merek: 'JBL' },
+            { kd_barang: 'E03', nama_barang: 'Casing', merek: 'Simba' }
+        ];
+        const dataSuplier = [
+            { kd_suplier: 'P01', nama_suplier: 'Jaya Sentosa', alamat: 'Jakarta', telp: '0213343343', email: 'jasasentosa@gmail.com' },
+            { kd_suplier: 'P02', nama_suplier: 'Komputama', alamat: 'Bandung', telp: '0227213334', email: 'komputama@gmail.com' }
+        ];
+        const dataTransaksi = [
+            { no_transaksi: 210312001, tanggal: '2012-03-21', kd_suplier: 'P01' },
+            { no_transaksi: 220312001, tanggal: '2012-03-21', kd_suplier: 'P02' }
+        ];
+        const dataDetTransaksi = [
+            { id_det_transaksi: 2, no_transaksi: 210312001, kd_barang: 'B01', jumlah: 5, harga: 200000 },
+            { id_det_transaksi: 3, no_transaksi: 210312001, kd_barang: 'C01', jumlah: 3, harga: 75000 },
+            { id_det_transaksi: 4, no_transaksi: 220312001, kd_barang: 'C01', jumlah: 3, harga: 75000 },
+            { id_det_transaksi: 5, no_transaksi: 220312001, kd_barang: 'D02', jumlah: 5, harga: 250000 },
+            { id_det_transaksi: 6, no_transaksi: 220312001, kd_barang: 'E03', jumlah: 3, harga: 750000 }
+        ];
+
+        // --- Fungsi utilitas untuk format mata uang IDR ---
+        const formatCurrency = (number) => {
+            const num = Number(number);
+            if (isNaN(num)) return 'N/A';
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        };
+
+        // --- Fungsi untuk mengisi tabel dengan data ---
+        function populateTable(tbodyId, data, columns, columnAlignments = {}) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const row = tbody.insertRow();
+                row.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'; // Simplified row class
+                columns.forEach(column => {
+                    const cell = row.insertCell();
+                    let content = item[column] !== undefined ? item[column] : 'N/A';
+                    if (column === 'harga') {
+                       content = formatCurrency(content);
+                    }
+                    cell.textContent = content;
+                    let alignmentClass = columnAlignments[column] || 'text-left';
+                    // Base cell styling + alignment + dark mode text
+                    cell.className = `px-6 py-4 whitespace-nowrap ${alignmentClass} text-gray-700 dark:text-gray-200`;
+                });
+            });
+        }
+
+        // --- Fungsi untuk mengisi tabel data gabungan ---
+        function populateJoinedTable() {
+            const tbody = document.getElementById('tbody-joined');
+            tbody.innerHTML = '';
+
+            dataDetTransaksi.forEach(detail => {
+                const transaksi = dataTransaksi.find(t => t.no_transaksi === detail.no_transaksi);
+                const suplier = transaksi ? dataSuplier.find(s => s.kd_suplier === transaksi.kd_suplier) : null;
+                const barang = dataBarang.find(b => b.kd_barang === detail.kd_barang);
+
+                if (transaksi && suplier && barang) {
+                    const row = tbody.insertRow();
+                    row.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'; // Simplified row class
+
+                    const addCell = (text, align = 'left') => {
+                        const cell = row.insertCell();
+                        cell.textContent = text;
+                        // Base cell styling + alignment + dark mode text
+                        cell.className = `px-6 py-4 whitespace-nowrap text-${align} text-gray-700 dark:text-gray-200`;
+                    };
+
+                    addCell(transaksi.no_transaksi);
+                    addCell(transaksi.tanggal);
+                    addCell(suplier.nama_suplier);
+                    addCell(barang.nama_barang);
+                    addCell(detail.jumlah, 'center');
+                    addCell(formatCurrency(detail.harga), 'right');
+                    addCell(formatCurrency(detail.jumlah * detail.harga), 'right');
+                }
+            });
+        }
+
+        // --- Fungsi untuk menampilkan tabel yang dipilih ---
+        function showTable(tableType) {
+            document.querySelectorAll('.data-table').forEach(table => table.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.getElementById(`table-${tableType}`).classList.add('active');
+             const buttons = document.querySelectorAll('.tab-button');
+             buttons.forEach(button => {
+                 if (button.getAttribute('onclick') === `showTable('${tableType}')`) {
+                     button.classList.add('active');
+                 }
+             });
+        }
+
+        // --- Logika Ganti Tema (Light/Dark) ---
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleButton = document.getElementById('theme-toggle');
+
+        const updateThemeIcons = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            } else {
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            }
+        };
+
+        updateThemeIcons(); // Panggil saat load
+
+        themeToggleButton.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcons();
+        });
+
+        // --- Set Tahun Copyright ---
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+        // --- Panggil fungsi populate saat halaman dimuat ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const alignmentDetTransaksi = { harga: 'right', jumlah: 'center' }; // Tambahkan center untuk jumlah
+            const alignmentJoined = { jumlah: 'center', harga: 'right', total_harga: 'right' };
+
+            populateTable('tbody-barang', dataBarang, ['kd_barang', 'nama_barang', 'merek']);
+            populateTable('tbody-suplier', dataSuplier, ['kd_suplier', 'nama_suplier', 'alamat', 'telp', 'email']);
+            populateTable('tbody-transaksi', dataTransaksi, ['no_transaksi', 'tanggal', 'kd_suplier']);
+            populateTable('tbody-det_transaksi', dataDetTransaksi, ['id_det_transaksi', 'no_transaksi', 'kd_barang', 'jumlah', 'harga'], alignmentDetTransaksi);
+            populateJoinedTable();
+
+            showTable('barang');
+        });
+    </script>
+
+</body>
+</html>
